@@ -98,7 +98,7 @@ In your `neoforge.mods.toml`:
     side = "BOTH"
 ```
 
-For soft compatibility with no hard dependency, just reference the `c:blood` tag — your mod stays compatible whether or not Hemodynamics is present.
+For soft compatibility with no hard dependency, reference the `c:blood` tag.
 
 ## License
 
