@@ -1,0 +1,12 @@
+{
+  "sources": [
+    {
+      "type": "single",
+      "resource": "hemodynamics:fluid/blood_still"
+    },
+    {
+      "type": "single",
+      "resource": "hemodynamics:fluid/blood_flow"
+    }
+  ]
+}

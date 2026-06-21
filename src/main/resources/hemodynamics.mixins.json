@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.midnight.hemodynamics.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "hemodynamics.refmap.json",
+  "mixins": [
+    "CrushingWheelControllerBlockEntityMixin"
+  ],
+  "client": [],
+  "injectors": { "defaultRequire": 1 }
+}

@@ -1,53 +1,105 @@
-# Create Mod Addon Template
+# Hemodynamics
 
-A ready-to-use template for building [Create](https://modrinth.com/mod/create) mod addons with **Java** and **NeoForge 1.21.1**.
+A [Create](https://modrinth.com/mod/create) add-on and library that adds a **Blood** fluid and the means to extract it. Blood is exposed as a standard fluid with common tag `c:blood` and a small, stable API.
 
-## What's Included
+## Features
 
-- **NeoForge 1.21.1** with Create 6.0.10 dependency
-- **Create Registrate** — Create's registration system, pre-configured
-- **Ponder & Flywheel** — Create's rendering and documentation libraries
-- **JEI** — recipe viewer integration (optional, compile-only)
-- **Mixin support** — pre-configured mixins
-- **GitHub Actions** — automatic builds on push/PR
-- **Gradle 8.10** with configuration cache enabled
+- **Blood** — a standard, placeable fluid with lava interaction (flowing lava + blood → netherrack)
+- **Blood extraction** — mobs killed by **Crushing Wheels** deposit blood into a **Basin** or **Item Drain** placed below. This is scaled by max health and mob type.
+- **`c:blood` common tag** — for cross-mod recipes and code, usable without a hard dependency.
+- **Library-friendly** — public API + documented, mergeable tags.
 
-## Getting Started
+## Requirements
 
-### 1. Use this template
+- Minecraft 1.21.1
+- NeoForge
+- Create 6.0+
 
-Click **"Use this template"** on GitHub, or clone and rename.
+## Configuration
 
-### 2. Configure your mod
+Server config: `serverconfig/hemodynamics-server.toml`
 
-Edit `gradle.properties`:
+| Option | Default | Description                                                       |
+|--------|---------|-------------------------------------------------------------------|
+| `blood_harvest.mbPerHealth` | `50` | Amount of blood (mB) per point of max health, before mob scaling. |
 
-```properties
-mod_id=yourmod
-mod_name=Your Mod Name
-mod_version=0.1.0
-mod_group_id=com.yourname.yourmod
-mod_authors=YourName
-mod_description=Your mod description.
-mod_license=MIT
+
+## Tags
+
+All tags are additive (`"replace": false`), so other mods and datapacks can contribute entries by shipping a file at the same path.
+
+### Fluid tags
+
+| Tag ID | Contains | Purpose |
+|--------|----------|---------|
+| `c:blood` | `hemodynamics:blood`, `hemodynamics:flowing_blood` | Common tag for the blood fluid. Reference this instead of the raw fluid id. |
+
+### Entity type tags (blood-harvest scaling)
+
+Determines how much blood a mob yields when killed by Crushing Wheels, as a fraction of `maxHealth * mbPerHealth`.
+
+| Tag ID | Yield | Default contents                          |
+|--------|-------|-------------------------------------------|
+| `hemodynamics:blood/trace`  | 10%  | bogged, husk                              |
+| `hemodynamics:blood/low`    | 25%  | `#minecraft:undead` (excluding skeletons) |
+| `hemodynamics:blood/medium` | 50%  | arthropods,  creepers, endermen           |
+| `hemodynamics:blood/full`   | 100% | villagers, animals, etc.                  |
+
+**Resolution order:** `blood/trace` → skeletons (0%) → `blood/medium` → `blood/low` → `blood/full` → `Animal` instances default to 100% → otherwise 0%.
+
+### Adding your mob
+
+Ship this in your mod jar or a datapack:
+
+`data/hemodynamics/tags/entity_type/blood/full.json`
+
+```json
+{
+  "replace": false,
+  "values": ["yourmod:giant_cow"]
+}
 ```
 
-### 3. Rename packages
+## For developers
 
-1. Rename `src/main/java/com/example/examplemod/` to match your `mod_group_id`
-2. Update `ExampleMod.java` — change `ID` to your `mod_id`
-3. Rename `src/main/resources/examplemod.mixins.json` to `{mod_id}.mixins.json`
-4. Update the package path inside the mixins JSON
+> Tag IDs and the `api` package are part of the public contract and will not change without a major version bump. Do **not** use `Hemodynamics.REGISTRATE` — create your own `CreateRegistrate` instance.
 
-### 4. Build and run
+### Gradle dependency
 
-```bash
-./gradlew build          # Build the mod
-./gradlew runClient      # Launch Minecraft with your mod
-./gradlew runServer      # Launch a dedicated server
-./gradlew runData        # Run data generators
+```gradle
+repositories {
+    maven { url = "https://api.modrinth.com/maven" } // or CurseMaven
+}
+dependencies {
+    implementation "maven.modrinth:hemodynamics:<version>"
+}
 ```
+
+### Using blood in code
+
+```java
+import net.midnight.hemodynamics.api.BloodFluids;
+
+FluidStack blood = BloodFluids.of(1000);          // 1000 mB of blood
+Fluid source = BloodFluids.source();              // hemodynamics:blood
+boolean isBlood = fluidState.is(BloodFluids.TAG); // c:blood
+```
+
+### Depending on Hemodynamics
+
+In your `neoforge.mods.toml`:
+
+```toml
+[[dependencies.yourmodid]]
+    modId = "hemodynamics"
+    type = "required"   # use "optional" for a soft dependency
+    versionRange = "[0.1.0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+```
+
+For soft compatibility with no hard dependency, just reference the `c:blood` tag — your mod stays compatible whether or not Hemodynamics is present.
 
 ## License
 
-This template is provided under the [MIT License](LICENSE). Your mod built from this template can use any license you choose.
+Hemodynamics is licensed under the [MIT License](LICENSE).
