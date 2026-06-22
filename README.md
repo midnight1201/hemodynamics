@@ -6,7 +6,6 @@ A [Create](https://modrinth.com/mod/create) add-on and library that adds a **Blo
 
 - **Blood** — a standard, placeable fluid with lava interaction (flowing lava + blood → netherrack)
 - **Blood extraction** — mobs killed by **Crushing Wheels** deposit blood into a **Basin** or **Item Drain** placed below. This is scaled by max health and mob type.
-- **`c:blood` common tag** — for cross-mod recipes and code, usable without a hard dependency.
 - **Library-friendly** — public API + documented, mergeable tags.
 
 ## Requirements
@@ -93,7 +92,7 @@ In your `neoforge.mods.toml`:
 [[dependencies.yourmodid]]
     modId = "hemodynamics"
     type = "required"   # use "optional" for a soft dependency
-    versionRange = "[0.1.0,)"
+    versionRange = "[1.0.0,)"
     ordering = "AFTER"
     side = "BOTH"
 ```
