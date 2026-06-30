@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "hemodynamics:blood",
+    "hemodynamics:flowing_blood"
+  ]
+}
